@@ -3,7 +3,7 @@
 // All HTTP calls to the Express backend go through here
 // ============================================================
 
-const API_BASE = "https://smart-gym-backend-y2oi.onrender.com";
+const API_BASE = 'https://smart-gym-backend-y2oi.onrender.com/api';
 
 // ---- Helper: build headers with JWT token ----
 function authHeaders() {
