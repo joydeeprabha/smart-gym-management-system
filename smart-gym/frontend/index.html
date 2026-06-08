@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Gym — Management System</title>
+
+    <!-- Google Fonts: Bebas Neue (display) + DM Sans (body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <!-- QR Code Scanner (jsQR) -->
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- ===================== LOGIN PAGE ===================== -->
+<div id="loginPage" class="auth-page">
+    <div class="auth-bg">
+        <div class="auth-bg-text">LIFT<br>PUSH<br>GRIND<br>REPEAT</div>
+    </div>
+    <div class="auth-card">
+        <div class="auth-logo">
+            <span class="logo-icon">⚡</span>
+            <span class="logo-text">SMART<span>GYM</span></span>
+        </div>
+        <h2>Welcome Back</h2>
+        <p class="auth-sub">Sign in to your account</p>
+
+        <div id="loginError" class="alert alert-error hidden"></div>
+
+        <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="loginEmail" placeholder="admin@smartgym.com" />
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="loginPassword" placeholder="••••••••" />
+        </div>
+        <button class="btn btn-primary btn-full" onclick="handleLogin()">
+            Sign In <span>→</span>
+        </button>
+
+        <p class="auth-switch">New member? <a href="#" onclick="showPage('registerPage')">Create Account</a></p>
+
+        <div class="demo-creds">
+            <p>🔑 Demo Admin: <code>admin@smartgym.com</code> / <code>admin123</code></p>
+            <p>🔑 Demo Member: <code>rajesh@example.com</code> / <code>password123</code></p>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== REGISTER PAGE ===================== -->
+<div id="registerPage" class="auth-page hidden">
+    <div class="auth-bg">
+        <div class="auth-bg-text">JOIN<br>TRAIN<br>WIN<br>GROW</div>
+    </div>
+    <div class="auth-card">
+        <div class="auth-logo">
+            <span class="logo-icon">⚡</span>
+            <span class="logo-text">SMART<span>GYM</span></span>
+        </div>
+        <h2>Join the Gym</h2>
+        <p class="auth-sub">Create your member account</p>
+
+        <div id="registerError" class="alert alert-error hidden"></div>
+        <div id="registerSuccess" class="alert alert-success hidden"></div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="regName" placeholder="John Doe" />
+            </div>
+            <div class="form-group">
+                <label>Age</label>
+                <input type="number" id="regAge" placeholder="25" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="regEmail" placeholder="you@example.com" />
+        </div>
+        <div class="form-group">
+            <label>Phone Number</label>
+            <input type="text" id="regPhone" placeholder="9876543210" />
+        </div>
+        <div class="form-group">
+            <label>Membership Plan</label>
+            <select id="regPlan">
+                <option value="basic">Basic — ₹1,200/month</option>
+                <option value="standard">Standard — ₹1,800/month</option>
+                <option value="premium">Premium — ₹2,500/month</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="regPassword" placeholder="Min 6 characters" />
+        </div>
+        <button class="btn btn-primary btn-full" onclick="handleRegister()">Create Account</button>
+        <p class="auth-switch">Already a member? <a href="#" onclick="showPage('loginPage')">Sign In</a></p>
+    </div>
+</div>
+
+<!-- ===================== MAIN APP ===================== -->
+<div id="appShell" class="hidden">
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <span class="logo-icon">⚡</span>
+            <span class="logo-text">SMART<span>GYM</span></span>
+            <button class="sidebar-close" onclick="toggleSidebar()">✕</button>
+        </div>
+
+        <div class="user-pill">
+            <div class="user-avatar" id="sidebarAvatar">A</div>
+            <div>
+                <div class="user-name" id="sidebarName">User</div>
+                <div class="user-role" id="sidebarRole">member</div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <!-- Admin nav -->
+            <div class="nav-section admin-only">
+                <div class="nav-label">Admin</div>
+                <a class="nav-item active" onclick="navigate('dashboard')">
+                    <span class="nav-icon">📊</span> Dashboard
+                </a>
+                <a class="nav-item" onclick="navigate('members')">
+                    <span class="nav-icon">👥</span> Members
+                </a>
+                <a class="nav-item" onclick="navigate('attendance')">
+                    <span class="nav-icon">📋</span> Attendance
+                </a>
+                <a class="nav-item" onclick="navigate('payments')">
+                    <span class="nav-icon">💳</span> Payments
+                </a>
+                <a class="nav-item" onclick="navigate('workouts')">
+                    <span class="nav-icon">🏋️</span> Workouts
+                </a>
+                <a class="nav-item" onclick="navigate('progress')">
+                    <span class="nav-icon">📈</span> Progress
+                </a>
+            </div>
+
+            <!-- Member nav -->
+            <div class="nav-section member-only hidden">
+                <div class="nav-label">My Gym</div>
+                <a class="nav-item active" onclick="navigate('memberDashboard')">
+                    <span class="nav-icon">🏠</span> My Dashboard
+                </a>
+                <a class="nav-item" onclick="navigate('myAttendance')">
+                    <span class="nav-icon">📋</span> My Attendance
+                </a>
+                <a class="nav-item" onclick="navigate('myPayments')">
+                    <span class="nav-icon">💳</span> My Payments
+                </a>
+                <a class="nav-item" onclick="navigate('myWorkout')">
+                    <span class="nav-icon">🏋️</span> My Workout
+                </a>
+                <a class="nav-item" onclick="navigate('myProgress')">
+                    <span class="nav-icon">📈</span> BMI & Progress
+                </a>
+                <a class="nav-item" onclick="navigate('myQR')">
+                    <span class="nav-icon">📱</span> My QR Code
+                </a>
+            </div>
+        </nav>
+
+        <button class="btn-logout" onclick="handleLogout()">
+            <span>⏻</span> Sign Out
+        </button>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-wrapper">
+        <!-- Top bar -->
+        <header class="topbar">
+            <button class="hamburger" onclick="toggleSidebar()">☰</button>
+            <div class="topbar-title" id="pageTitle">Dashboard</div>
+            <div class="topbar-actions">
+                <span id="topbarUser" class="topbar-user"></span>
+            </div>
+        </header>
+
+        <!-- Page Views -->
+        <main class="content-area">
+
+            <!-- ========== ADMIN DASHBOARD ========== -->
+            <section id="view-dashboard" class="view">
+                <div class="page-header">
+                    <h1>Dashboard</h1>
+                    <p>Welcome back! Here's what's happening at the gym today.</p>
+                </div>
+
+                <!-- KPI Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card accent-orange">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-body">
+                            <div class="stat-value" id="statTotalMembers">—</div>
+                            <div class="stat-label">Total Members</div>
+                        </div>
+                    </div>
+                    <div class="stat-card accent-green">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-body">
+                            <div class="stat-value" id="statActiveMembers">—</div>
+                            <div class="stat-label">Active Members</div>
+                        </div>
+                    </div>
+                    <div class="stat-card accent-blue">
+                        <div class="stat-icon">📋</div>
+                        <div class="stat-body">
+                            <div class="stat-value" id="statTodayAtt">—</div>
+                            <div class="stat-label">Today's Attendance</div>
+                        </div>
+                    </div>
+                    <div class="stat-card accent-gold">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-body">
+                            <div class="stat-value" id="statRevenue">—</div>
+                            <div class="stat-label">Monthly Revenue</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="charts-row">
+                    <div class="chart-card">
+                        <h3>Weekly Attendance</h3>
+                        <canvas id="attendanceChart" height="200"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Plan Distribution</h3>
+                        <canvas id="planChart" height="200"></canvas>
+                    </div>
+                </div>
+
+                <!-- Recent Payments -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h3>Recent Payments</h3>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>Member</th><th>Amount</th><th>Date</th><th>Status</th></tr>
+                        </thead>
+                        <tbody id="recentPaymentsTable"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ========== MEMBERS ========== -->
+            <section id="view-members" class="view hidden">
+                <div class="page-header">
+                    <h1>Members</h1>
+                    <button class="btn btn-primary" onclick="openAddMemberModal()">+ Add Member</button>
+                </div>
+
+                <div class="search-bar">
+                    <input type="text" id="memberSearch" placeholder="Search by name, email or plan…" oninput="filterMembers()" />
+                </div>
+
+                <div class="card">
+                    <table class="data-table" id="membersTable">
+                        <thead>
+                            <tr>
+                                <th>#</th><th>Name</th><th>Email</th><th>Phone</th>
+                                <th>Plan</th><th>Joined</th><th>Status</th><th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="membersTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ========== ATTENDANCE ========== -->
+            <section id="view-attendance" class="view hidden">
+                <div class="page-header">
+                    <h1>Attendance</h1>
+                </div>
+
+                <div class="two-col">
+                    <!-- QR Scanner -->
+                    <div class="card">
+                        <div class="card-header"><h3>📷 Scan QR to Mark Attendance</h3></div>
+                        <div class="qr-scanner-area">
+                            <video id="qrVideo" autoplay playsinline></video>
+                            <canvas id="qrCanvas" class="hidden"></canvas>
+                            <div id="qrResult" class="qr-result"></div>
+                        </div>
+                        <button class="btn btn-primary mt-2" onclick="startQRScan()">Start Camera</button>
+                        <button class="btn btn-secondary mt-2" onclick="stopQRScan()">Stop</button>
+                        <div class="divider">or enter manually</div>
+                        <div class="form-row">
+                            <input type="number" id="manualMemberId" placeholder="Member ID" />
+                            <button class="btn btn-primary" onclick="markManualAttendance()">Mark Present</button>
+                        </div>
+                    </div>
+
+                    <!-- Today's log -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Today's Log</h3>
+                            <span id="todayCount" class="badge">0</span>
+                        </div>
+                        <table class="data-table">
+                            <thead><tr><th>Member</th><th>Time</th><th>Status</th></tr></thead>
+                            <tbody id="attendanceTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== PAYMENTS ========== -->
+            <section id="view-payments" class="view hidden">
+                <div class="page-header">
+                    <h1>Payments</h1>
+                    <button class="btn btn-primary" onclick="openAddPaymentModal()">+ Record Payment</button>
+                </div>
+
+                <div class="stats-grid mini">
+                    <div class="stat-card accent-green">
+                        <div class="stat-body">
+                            <div class="stat-value" id="payTotalRev">—</div>
+                            <div class="stat-label">Total Revenue</div>
+                        </div>
+                    </div>
+                    <div class="stat-card accent-gold">
+                        <div class="stat-body">
+                            <div class="stat-value" id="payMonthRev">—</div>
+                            <div class="stat-label">This Month</div>
+                        </div>
+                    </div>
+                    <div class="stat-card accent-red">
+                        <div class="stat-body">
+                            <div class="stat-value" id="payPending">—</div>
+                            <div class="stat-label">Pending Fees</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="tab-bar">
+                        <button class="tab-btn active" onclick="switchPayTab('all', this)">All Payments</button>
+                        <button class="tab-btn" onclick="switchPayTab('pending', this)">Pending Only</button>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>Member</th><th>Plan</th><th>Amount</th><th>Date</th><th>Status</th><th>Action</th></tr>
+                        </thead>
+                        <tbody id="paymentsTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ========== WORKOUTS ========== -->
+            <section id="view-workouts" class="view hidden">
+                <div class="page-header">
+                    <h1>Workout Plans</h1>
+                    <button class="btn btn-primary" onclick="openAssignWorkoutModal()">+ Assign Plan</button>
+                </div>
+                <div id="workoutsGrid" class="workouts-grid"></div>
+            </section>
+
+            <!-- ========== PROGRESS ========== -->
+            <section id="view-progress" class="view hidden">
+                <div class="page-header">
+                    <h1>BMI & Progress</h1>
+                    <button class="btn btn-primary" onclick="openAddProgressModal()">+ Add Entry</button>
+                </div>
+                <div class="card">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>Member</th><th>Height (cm)</th><th>Weight (kg)</th><th>BMI</th><th>Category</th><th>Date</th></tr>
+                        </thead>
+                        <tbody id="progressTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ========== MEMBER DASHBOARD ========== -->
+            <section id="view-memberDashboard" class="view hidden">
+                <div class="page-header">
+                    <h1>My Dashboard</h1>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card accent-orange">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-body">
+                            <div class="stat-value" id="mPlan">—</div>
+                            <div class="stat-label">My Plan</div>
+                        </div>
+                    </div>
+                    <div class="stat-card accent-blue">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-body">
+                            <div class="stat-value" id="mJoined">—</div>
+                            <div class="stat-label">Joined Since</div>
+                        </div>
+                    </div>
+                    <div class="stat-card accent-green">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-body">
+                            <div class="stat-value" id="mAttCount">—</div>
+                            <div class="stat-label">My Attendance</div>
+                        </div>
+                    </div>
+                    <div class="stat-card accent-gold">
+                        <div class="stat-icon">⚖️</div>
+                        <div class="stat-body">
+                            <div class="stat-value" id="mBMI">—</div>
+                            <div class="stat-label">Latest BMI</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== MY ATTENDANCE ========== -->
+            <section id="view-myAttendance" class="view hidden">
+                <div class="page-header"><h1>My Attendance</h1></div>
+                <div class="card">
+                    <table class="data-table">
+                        <thead><tr><th>#</th><th>Date</th><th>Status</th><th>Check-in Time</th></tr></thead>
+                        <tbody id="myAttTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ========== MY PAYMENTS ========== -->
+            <section id="view-myPayments" class="view hidden">
+                <div class="page-header"><h1>My Payments</h1></div>
+                <div class="card">
+                    <table class="data-table">
+                        <thead><tr><th>#</th><th>Amount</th><th>Date</th><th>Status</th><th>Notes</th></tr></thead>
+                        <tbody id="myPayTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ========== MY WORKOUT ========== -->
+            <section id="view-myWorkout" class="view hidden">
+                <div class="page-header"><h1>My Workout Plan</h1></div>
+                <div id="myWorkoutContent"></div>
+            </section>
+
+            <!-- ========== MY PROGRESS ========== -->
+            <section id="view-myProgress" class="view hidden">
+                <div class="page-header">
+                    <h1>BMI & Progress</h1>
+                    <button class="btn btn-primary" onclick="openAddProgressModal()">+ Log Today</button>
+                </div>
+
+                <div class="card mb-4">
+                    <canvas id="myProgressChart" height="120"></canvas>
+                </div>
+                <div class="card">
+                    <table class="data-table">
+                        <thead><tr><th>Date</th><th>Height</th><th>Weight</th><th>BMI</th><th>Category</th></tr></thead>
+                        <tbody id="myProgressTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ========== MY QR CODE ========== -->
+            <section id="view-myQR" class="view hidden">
+                <div class="page-header"><h1>My QR Code</h1></div>
+                <div class="qr-display-card">
+                    <p>Show this QR code at the gym entrance to mark your attendance.</p>
+                    <img id="myQRImage" src="" alt="Your QR Code" class="qr-image" />
+                    <p id="qrMemberName" class="qr-name"></p>
+                    <button class="btn btn-primary" onclick="downloadQR()">⬇ Download QR</button>
+                </div>
+            </section>
+
+        </main>
+    </div>
+</div>
+
+<!-- ===================== MODALS ===================== -->
+
+<!-- Add Member Modal -->
+<div id="addMemberModal" class="modal-overlay hidden">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Add New Member</h3>
+            <button onclick="closeModal('addMemberModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-row">
+                <div class="form-group"><label>Full Name</label><input type="text" id="mName" /></div>
+                <div class="form-group"><label>Age</label><input type="number" id="mAge" /></div>
+            </div>
+            <div class="form-group"><label>Email</label><input type="email" id="mEmail" /></div>
+            <div class="form-group"><label>Phone</label><input type="text" id="mPhone" /></div>
+            <div class="form-group"><label>Password</label><input type="password" id="mPass" /></div>
+            <div class="form-group">
+                <label>Plan</label>
+                <select id="mPlanSel">
+                    <option value="basic">Basic</option>
+                    <option value="standard">Standard</option>
+                    <option value="premium">Premium</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('addMemberModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="submitAddMember()">Add Member</button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Member Modal -->
+<div id="editMemberModal" class="modal-overlay hidden">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Edit Member</h3>
+            <button onclick="closeModal('editMemberModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="editMemberId" />
+            <div class="form-row">
+                <div class="form-group"><label>Full Name</label><input type="text" id="editName" /></div>
+                <div class="form-group"><label>Age</label><input type="number" id="editAge" /></div>
+            </div>
+            <div class="form-group"><label>Phone</label><input type="text" id="editPhone" /></div>
+            <div class="form-group">
+                <label>Plan</label>
+                <select id="editPlan">
+                    <option value="basic">Basic</option>
+                    <option value="standard">Standard</option>
+                    <option value="premium">Premium</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Status</label>
+                <select id="editStatus">
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('editMemberModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="submitEditMember()">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Payment Modal -->
+<div id="addPaymentModal" class="modal-overlay hidden">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Record Payment</h3>
+            <button onclick="closeModal('addPaymentModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Member</label>
+                <select id="payMemberSel"></select>
+            </div>
+            <div class="form-group"><label>Amount (₹)</label><input type="number" id="payAmount" placeholder="2500" /></div>
+            <div class="form-group">
+                <label>Status</label>
+                <select id="payStatus">
+                    <option value="paid">Paid</option>
+                    <option value="pending">Pending</option>
+                </select>
+            </div>
+            <div class="form-group"><label>Notes</label><input type="text" id="payNotes" placeholder="e.g. March membership" /></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('addPaymentModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="submitAddPayment()">Record</button>
+        </div>
+    </div>
+</div>
+
+<!-- Assign Workout Modal -->
+<div id="assignWorkoutModal" class="modal-overlay hidden">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Assign Workout Plan</h3>
+            <button onclick="closeModal('assignWorkoutModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Member</label>
+                <select id="wMemberSel"></select>
+            </div>
+            <div class="form-group"><label>Plan Name</label><input type="text" id="wPlanName" placeholder="e.g. Muscle Building" /></div>
+            <div class="form-group">
+                <label>Plan Details (one exercise per line)</label>
+                <textarea id="wPlanDetails" rows="6" placeholder="Monday: Bench Press 4x10, Push-ups 3x15&#10;Wednesday: Deadlift 4x8, Pull-ups 3x10&#10;Friday: Squats 4x10, Lunges 3x12"></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('assignWorkoutModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="submitAssignWorkout()">Assign</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Progress Modal -->
+<div id="addProgressModal" class="modal-overlay hidden">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Log BMI Entry</h3>
+            <button onclick="closeModal('addProgressModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div id="progMemberRow" class="form-group">
+                <label>Member</label>
+                <select id="progMemberSel"></select>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Height (cm)</label><input type="number" id="progHeight" placeholder="175" /></div>
+                <div class="form-group"><label>Weight (kg)</label><input type="number" id="progWeight" placeholder="75" /></div>
+            </div>
+            <div class="form-group">
+                <label>BMI Preview</label>
+                <div id="bmiPreview" class="bmi-preview">Enter height & weight to calculate</div>
+            </div>
+            <div class="form-group"><label>Notes</label><input type="text" id="progNotes" placeholder="Optional notes" /></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('addProgressModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="submitProgress()">Save Entry</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" class="toast hidden"></div>
+
+<!-- JavaScript -->
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
